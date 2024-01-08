@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getGames } from "../services/gameServices";
 import { getAllPlatformPosts } from "../services/postServices";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { createPostReaction } from "../services/reactionServices";
 
 export const Platform = () => {
   const [games, setGames] = useState([]);
@@ -10,37 +11,43 @@ export const Platform = () => {
   const [reactions, setReactions] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const getAndSetGames = async () => {
-      try {
-        const gamesArray = await getGames();
-        console.log("platformId:", platformId);
-        console.log("gamesArray:", gamesArray);
-        setGames(gamesArray);
-      } catch (error) {
-        console.error("Error fetching games:", error);
-      }
-    };
+  const getAndSetPosts = async () => {
+    try {
+      const postArray = await getAllPlatformPosts();
+      console.log("postArray:", postArray);
+      setPlatformPost(postArray);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
-    const getAndSetPosts = async () => {
-      try {
-        const postArray = await getAllPlatformPosts();
-        console.log("postArray:", postArray);
-        setPlatformPost(postArray);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
+  const getAndSetGames = async () => {
+    try {
+      const gamesArray = await getGames();
+      console.log("platformId:", platformId);
+      console.log("gamesArray:", gamesArray);
+      setGames(gamesArray);
+    } catch (error) {
+      console.error("Error fetching games:", error);
+    }
+  };
+
+
+  useEffect(() => {
 
     getAndSetGames();
     getAndSetPosts();
   }, [platformId]);
 
 
-  const handleLikeButton = () => {
-    console.log("clicked")
-  }
-
+  const handleLikeButton = async (postId) => {
+    try {
+      await createPostReaction(postId, 1);
+      getAndSetPosts();
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
   const handleNewGame = () => {
     navigate('/new-game'); // Replace '/new-game' with the route for your new-game form
   };
@@ -77,9 +84,7 @@ export const Platform = () => {
               <p>{post.link}</p>
               <img src={post.post_image_url} alt={post.description} />
               {/* Add more post details */}
-              <button onClick={handleLikeButton} className="fa fa-thumbs-up">Like
-              </button>
-              <button onClick={handleLikeButton} className="fa fa-thumbs-up">Dislike
+              <button onClick={() => { handleLikeButton(post.id) }} className="fa fa-thumbs-up">Like
               </button>
             </div>
           )
