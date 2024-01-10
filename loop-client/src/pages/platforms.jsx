@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { getGames } from "../services/gameServices";
-import { getAllPlatformPosts } from "../services/postServices";
+import { deletePlatformPost, getAllPlatformPosts } from "../services/postServices";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { createPostReaction } from "../services/reactionServices";
 
+
+
 export const Platform = () => {
+  const [likeActive, setLikeActive] = useState(false);
+  const [dislikeActive, setDislikeActive] = useState(false);
   const [games, setGames] = useState([]);
   const [platformPost, setPlatformPost] = useState([]);
   const { platformId } = useParams();
-  const [reactions, setReactions] = useState([]);
   const navigate = useNavigate();
 
   const getAndSetPosts = async () => {
@@ -44,18 +47,63 @@ export const Platform = () => {
     try {
       await createPostReaction(postId, 1);
       getAndSetPosts();
+      setLikeActive(!likeActive);
+      setDislikeActive(false);
     } catch (error) {
       console.error("Error liking post:", error);
+    }
+  };
+
+  const handleDislikeButton = async (postId) => {
+    try {
+      await createPostReaction(postId, 2);
+      getAndSetPosts();
+      setDislikeActive(!dislikeActive);
+      setLikeActive(false);
+    } catch (error) {
+      console.error("Error disliking post:", error);
     }
   };
   const handleNewGame = () => {
     navigate('/new-game'); // Replace '/new-game' with the route for your new-game form
   };
 
+  // const handleDelete = async (post) => { // Change the argument name to 'post'
+  //   const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+  //   if (confirmDelete) {
+  //     try {
+  //       await deletePlatformPost(post.id);
+  //       getAndSetPosts((prevPosts) => prevPosts.filter((prevPost) => prevPost.id !== post.id));
+  //     } catch (error) {
+  //       console.error("Error deleting post:", error);
+  //     }
+  //   }
+  // };
+
+  const handleDelete = async (postId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+    if (confirmDelete) {
+      try {
+        await deletePlatformPost(postId);
+        getAndSetPosts((prevPosts) => prevPosts.filter((prevPost) => prevPost.id !== postId));
+      } catch (error) {
+        console.error("Error deleting post:", error);
+      }
+    }
+  };
+
+  const handleNewPost = () => {
+    navigate(`/new-post`);
+  };
+
+  const handleEdit = (postId) => {
+    navigate(`/${postId}/edit-platform-post`);
+  };
+
   return (
     <div className="platform-container">
       <div className="games-container">
-        <h2>Games</h2>
+        <h2 className="games-header">Games</h2>
         {/* Render game cards */}
         {games.map((game) => (
           // Check if the game's platform_id matches the platformId
@@ -63,7 +111,19 @@ export const Platform = () => {
             <div className="game-card" key={game.id} onClick={() => navigate(`/games/${game.id}`)}>
               <Link to={`/games/${game.id}`}>
                 {/* Display game details */}
-                <img src={game.game_img_url} alt={game.title} />
+                <div className="image-container" style={{ width: '250px', height: '250px' }}>
+                  <img
+                    src={game.game_image_url}
+                    alt={game.title}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      borderRadius: '10px',
+                      border: '2px solid black',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
                 {/* Add more game details */}
                 <h3>{game.title}</h3>
               </Link>
@@ -84,12 +144,39 @@ export const Platform = () => {
               <p>{post.link}</p>
               <img src={post.post_image_url} alt={post.description} />
               {/* Add more post details */}
-              <button onClick={() => { handleLikeButton(post.id) }} className="fa fa-thumbs-up">Like
-              </button>
+              <div>
+                <button
+                  onClick={() => {
+                    handleLikeButton(post.id);
+                  }}
+                  className={`fa fa-thumbs-up ${likeActive ? 'active-like' : ''}`}
+                >
+                  Like
+                </button>
+                <button
+                  onClick={() => {
+                    handleDislikeButton(post.id);
+                  }}
+                  className={`fa fa-thumbs-down ${dislikeActive ? 'active-dislike' : ''}`}
+                >
+                  Dislike
+                </button>
+                {post?.is_owner ? (
+                  <div className="mt-4">
+                    <button onClick={() => handleDelete(post.id)}>DELETE</button>
+                    <button onClick={() => handleEdit(post.id)}>EDIT</button>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
             </div>
           )
         ))}
+        <button onClick={handleNewPost}>New Post</button>
       </div>
     </div>
   );
 };
+
+

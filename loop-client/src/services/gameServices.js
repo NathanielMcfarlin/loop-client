@@ -49,6 +49,6 @@ export const editGame = (game) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(game),
-    });
+    }).then((res) => res.json());
   };
   
