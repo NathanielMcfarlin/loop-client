@@ -1,15 +1,13 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { registerUser } from "/home/nathanielmcfarlin/workspace/loop-client/loop-client/src/managers/AuthManager.js"
 
 export const Register = ({ setToken }) => {
+  const [isStaff, setIsStaff] = useState(false);
   const firstName = useRef()
   const lastName = useRef()
-  const email = useRef()
   const username = useRef()
-  const profile_image_url = useRef()
-  const bio = useRef()
   const password = useRef()
   const verifyPassword = useRef()
   const passwordDialog = useRef()
@@ -23,10 +21,8 @@ export const Register = ({ setToken }) => {
         username: username.current.value,
         first_name: firstName.current.value,
         last_name: lastName.current.value,
-        email: email.current.value,
         password: password.current.value,
-        profile_image_url: profile_image_url.current.value,
-        bio: bio.current.value
+        is_staff: isStaff
       }
 
       registerUser(newUser)
@@ -41,10 +37,14 @@ export const Register = ({ setToken }) => {
     }
   }
 
+  const handleStaffChange = (e) => {
+    setIsStaff(e.target.checked); // Update isStaff state based on checkbox value
+  };
+
   return (
     <section className="columns is-centered">
       <form className="column is-two-thirds" onSubmit={handleRegister}>
-        <h1 className="title">Rare Publishing</h1>
+        <h1 className="title">In The Loop</h1>
         <p className="subtitle">Create an account</p>
         <div className="field">
           <label className="label">First Name</label>
@@ -67,12 +67,7 @@ export const Register = ({ setToken }) => {
           </div>
         </div>
 
-        <div className="field">
-          <label className="label">Email</label>
-          <div className="control">
-            <input className="input" type="email" ref={email} />
-          </div>
-        </div>
+
 
         <div className="field">
           <label className="label">Password</label>
@@ -91,19 +86,20 @@ export const Register = ({ setToken }) => {
           </div>
         </div>
 
-        <div className="field">
-          <label className="label">Bio</label>
-          <div className="control">
-            <textarea className="textarea" placeholder="Tell us about yourself..." ref={bio}></textarea>
-          </div>
-        </div>
+
+
 
         <div className="field">
-          <label className="label">Profile Picture</label>
-          <div className="control">
-            <textarea className="input" placeholder="http://www.image.com" ref={profile_image_url}></textarea>
-          </div>
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              onChange={handleStaffChange}
+              checked={isStaff} // Use the isStaff state for checkbox status
+            />
+            Are you staff?
+          </label>
         </div>
+
 
         <div className="field is-grouped">
           <div className="control">

@@ -30,7 +30,7 @@ export const Login = ({ setToken }) => {
   return (
     <section className="columns is-centered">
       <form className="column is-two-thirds" onSubmit={handleLogin}>
-        <h1 className="title">Rare Publishing</h1>
+        <h1 className="title">In the Loop</h1>
         <p className="subtitle">Please sign in</p>
 
         <div className="field">

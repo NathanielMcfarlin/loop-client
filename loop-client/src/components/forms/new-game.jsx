@@ -51,13 +51,11 @@ export const NewGame = () => {
 
   return (
     <main>
-      <form onSubmit={handleSave}>
-        <div>
+      <form onSubmit={handleSave} className="new-game-form">
+        <div className="form-container">
           <h1>NEW GAME FORM</h1>
-        </div>
-        <div>
           <fieldset>
-            <div>
+            <div className="form-group">
               <label>Title:</label>
               <input
                 id="title"
@@ -65,6 +63,7 @@ export const NewGame = () => {
                 type="text"
                 value={game.title}
                 required
+                className="form-control"
               />
               <label>Image:</label>
               <input
@@ -73,6 +72,7 @@ export const NewGame = () => {
                 type="text"
                 value={game.game_image_url}
                 required
+                className="form-control"
               />
               <label>Platform:</label>
               <select
@@ -80,6 +80,7 @@ export const NewGame = () => {
                 onChange={updatePlatform}
                 value={game.platform}
                 required
+                className="form-control"
               >
                 <option value="">Select a platform</option>
                 {platforms.map((platform) => (
@@ -90,8 +91,8 @@ export const NewGame = () => {
               </select>
             </div>
           </fieldset>
+          <button type="submit" className="btn-create">Create Game</button>
         </div>
-        <button type="submit">Create Game</button>
       </form>
     </main>
   );

@@ -8,15 +8,17 @@ export const getAllPlatformPosts = () => {
   }).then((res) => res.json());
 };
 
-export const getPlatformPostById = (id) => {
-  return fetch(`http://localhost:8000/platform_posts/${id}`, {
-    method: "GET",
+export const createPlatformPost = (newPost) => {
+  return fetch(`http://localhost:8000/platform_posts`, {
+    method: "POST",
     headers: {
       Authorization: `Token ${localStorage.getItem("auth_token")}`,
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(newPost), // Include the post data in the body
   }).then((res) => res.json());
 };
+
 
 export const getPlatformPostByPostId = (postId) => {
   return fetch(`http://localhost:8000/platform_posts/${postId}`, {
