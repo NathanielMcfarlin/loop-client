@@ -19,6 +19,17 @@ export const createPlatformPost = (newPost) => {
   }).then((res) => res.json());
 };
 
+export const likePost = (postId) => {
+  return fetch(`http://localhost:8000/likes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${localStorage.getItem("auth_token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: postId }),
+  }).then((res) => res.json());
+};
+
 
 export const getPlatformPostByPostId = (postId) => {
   return fetch(`http://localhost:8000/platform_posts/${postId}`, {
