@@ -1,24 +1,43 @@
 import { useEffect, useState } from "react";
 import { getGames } from "../services/gameServices";
-import { deletePlatformPost, getAllPlatformPosts } from "../services/postServices";
+import { deletePlatformPost, getAllPlatformPosts, likePost } from "../services/postServices";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { createPostReaction } from "../services/reactionServices";
+// import { createPostReaction } from "../services/reactionServices";
 
 
 
 export const Platform = () => {
-  const [likeActive, setLikeActive] = useState(false);
-  const [dislikeActive, setDislikeActive] = useState(false);
+  // const [likeActive, setLikeActive] = useState(false);
+  // const [dislikeActive, setDislikeActive] = useState(false);
+  const [likeState, setLikeState] = useState({});
   const [games, setGames] = useState([]);
   const [platformPost, setPlatformPost] = useState([]);
   const { platformId } = useParams();
   const navigate = useNavigate();
 
+  // const getAndSetPosts = async () => {
+  //   try {
+  //     const postArray = await getAllPlatformPosts();
+  //     console.log("postArray:", postArray);
+  //     setPlatformPost(postArray);
+  //   } catch (error) {
+  //     console.error("Error fetching posts:", error);
+  //   }
+  // };
+
   const getAndSetPosts = async () => {
     try {
       const postArray = await getAllPlatformPosts();
       console.log("postArray:", postArray);
+
+      // Initialize like state for new posts
+      const newLikeState = postArray.reduce((state, post) => {
+        state[post.id] = likeState[post.id] || false;
+        return state;
+      }, {});
+
       setPlatformPost(postArray);
+      setLikeState(newLikeState);
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
@@ -42,28 +61,43 @@ export const Platform = () => {
     getAndSetPosts();
   }, [platformId]);
 
-
   const handleLikeButton = async (postId) => {
     try {
-      await createPostReaction(postId, 1);
-      getAndSetPosts();
-      setLikeActive(!likeActive);
-      setDislikeActive(false);
+      await likePost(postId);
+      await getAndSetPosts(); // Wait for posts to be updated
+      setLikeState((prevLikeState) => ({
+        ...prevLikeState,
+        [postId]: !prevLikeState[postId], // Toggle like state for the specific post
+      }));
     } catch (error) {
       console.error("Error liking post:", error);
     }
   };
 
-  const handleDislikeButton = async (postId) => {
-    try {
-      await createPostReaction(postId, 2);
-      getAndSetPosts();
-      setDislikeActive(!dislikeActive);
-      setLikeActive(false);
-    } catch (error) {
-      console.error("Error disliking post:", error);
-    }
-  };
+
+  // const handleLikeButton = async (postId) => {
+  //   try {
+  //     await likePost(postId);
+  //     getAndSetPosts();
+  //     setLikeActive(!likeActive);
+  //     setDislikeActive(false);
+  //   } catch (error) {
+  //     console.error("Error liking post:", error);
+  //   }
+  // };
+
+  // const handleDislikeButton = async (postId) => {
+  //   try {
+  //     await createPostReaction(postId, 2);
+  //     getAndSetPosts();
+  //     setDislikeActive(!dislikeActive);
+  //     setLikeActive(false);
+  //   } catch (error) {
+  //     console.error("Error disliking post:", error);
+  //   }
+  // };
+
+
   const handleNewGame = () => {
     navigate('/new-game'); // Replace '/new-game' with the route for your new-game form
   };
@@ -149,18 +183,20 @@ export const Platform = () => {
                   onClick={() => {
                     handleLikeButton(post.id);
                   }}
-                  className={`fa fa-thumbs-up ${likeActive ? 'active-like' : ''}`}
+                  className={`fa fa-thumbs-up ${likeState[post.id] ? 'active-like' : ''}`}
                 >
                   Like
                 </button>
-                <button
+                {/* <button
                   onClick={() => {
                     handleDislikeButton(post.id);
                   }}
                   className={`fa fa-thumbs-down ${dislikeActive ? 'active-dislike' : ''}`}
                 >
                   Dislike
-                </button>
+                </button> */}
+              </div>
+              <div>
                 {post?.is_owner ? (
                   <div className="mt-4">
                     <button onClick={() => handleDelete(post.id)}>DELETE</button>
