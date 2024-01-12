@@ -50,7 +50,7 @@ export const Game = () => {
             navigate(`/`);
           })
           .catch((error) => {
-            console.error("Error deleting game:", error);
+            window.alert("Error deleting game:", error);
           });
       }
     }

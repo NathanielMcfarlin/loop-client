@@ -9,7 +9,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 export const Platform = () => {
   // const [likeActive, setLikeActive] = useState(false);
   // const [dislikeActive, setDislikeActive] = useState(false);
-  const [likeState, setLikeState] = useState({});
+  // const [likeState, setLikeState] = useState({});
   const [games, setGames] = useState([]);
   const [platformPost, setPlatformPost] = useState([]);
   const { platformId } = useParams();
@@ -30,14 +30,7 @@ export const Platform = () => {
       const postArray = await getAllPlatformPosts();
       console.log("postArray:", postArray);
 
-      // Initialize like state for new posts
-      const newLikeState = postArray.reduce((state, post) => {
-        state[post.id] = likeState[post.id] || false;
-        return state;
-      }, {});
-
       setPlatformPost(postArray);
-      setLikeState(newLikeState);
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
@@ -65,10 +58,6 @@ export const Platform = () => {
     try {
       await likePost(postId);
       await getAndSetPosts(); // Wait for posts to be updated
-      setLikeState((prevLikeState) => ({
-        ...prevLikeState,
-        [postId]: !prevLikeState[postId], // Toggle like state for the specific post
-      }));
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -183,9 +172,9 @@ export const Platform = () => {
                   onClick={() => {
                     handleLikeButton(post.id);
                   }}
-                  className={`fa fa-thumbs-up ${likeState[post.id] ? 'active-like' : ''}`}
+                  className={`fa fa-thumbs-up ${post.liked ? 'active-like' : ''}`}
                 >
-                  Like
+                  Like {post.likes.length}
                 </button>
                 {/* <button
                   onClick={() => {

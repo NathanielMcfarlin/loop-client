@@ -11,7 +11,7 @@ export const EditPlatformPost = ({ userId }) => {
     post_image_url: "",
     platform: "", // Change 'platform' to an object to match the structure
     user: userId,
-    reactions: [],
+    likes: [],
     is_staff: false,
   });
   const [platforms, setPlatforms] = useState([]);
@@ -61,7 +61,7 @@ export const EditPlatformPost = ({ userId }) => {
 
     // Send updated item to server
     editPlatformPost(updatedItem).then(() => {
-      navigate(`/platforms`);
+      navigate(`/`);
     });
   };
 
