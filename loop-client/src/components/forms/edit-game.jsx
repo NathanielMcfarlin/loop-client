@@ -1,11 +1,12 @@
 import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { editGame, getGameById } from "../../services/gameServices";
-
+import { getPlatform } from "../../services/platformService";
 
 export const EditGame = () => {
   let { gameId } = useParams();
   const [game, setGame] = useState(null);
+  const [platforms, setPlatforms] = useState([]);
 
   const fetchGame = () => {
     getGameById(gameId).then((fetchedGame) => {
@@ -13,8 +14,16 @@ export const EditGame = () => {
     });
   };
 
+  const fetchPlatforms = () => {
+    // Assuming you have a service function getAllPlatforms to fetch all platforms
+    getPlatform().then((allPlatforms) => {
+      setPlatforms(allPlatforms);
+    });
+  };
+
   useEffect(() => {
     fetchGame();
+    fetchPlatforms(); // Fetch platforms when the component mounts
   }, [gameId]);
 
   const updateGameData = (e) => {
@@ -25,7 +34,7 @@ export const EditGame = () => {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    console.log(game)
+    console.log(game);
     editGame(game).then((updatedGame) => {
       // Assuming the updated game response includes the updated game details
       Navigate(`/game/${updatedGame.id}`);
@@ -58,18 +67,25 @@ export const EditGame = () => {
                   required
                   className="form-control"
                 />
-                <label>Platform:</label>
-                <input
+                <label>Select Platform:</label>
+                <select
                   id="platform"
                   onChange={updateGameData}
-                  type="text"
-                  value={game.platform}
+                  value={game.platform ? game.platform : ''}
                   required
-                  className="form-control"
-                />
+                >
+                  {/* Map through 'platforms' to render platform options */}
+                  {platforms.map((platform) => (
+                    <option key={platform.id} value={platform.id}>
+                      {platform.platform}
+                    </option>
+                  ))}
+                </select>
               </div>
             </fieldset>
-            <button type="submit" className="btn-update">Update Game</button>
+            <button type="submit" className="btn-update">
+              Update Game
+            </button>
           </div>
         </form>
       )}
